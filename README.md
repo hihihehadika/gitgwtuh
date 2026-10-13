@@ -3,7 +3,6 @@
 [![CI](https://img.shields.io/github/actions/workflow/status/hihihehadika/gitgwtuh/ci.yml?branch=main&style=for-the-badge&logo=github&logoColor=white&label=CI&labelColor=0f172a&color=38bdf8)](https://github.com/hihihehadika/gitgwtuh/actions)
 [![Go](https://img.shields.io/badge/Go-1.22+-38bdf8?style=for-the-badge&logo=go&logoColor=white&labelColor=0f172a)](https://golang.org)
 [![TUI](https://img.shields.io/badge/TUI-Bubbletea-3b82f6?style=for-the-badge&logo=terminal&logoColor=white&labelColor=0f172a)](https://github.com/charmbracelet/bubbletea)
-[![Version](https://img.shields.io/badge/Release-v1.0.0-10b981?style=for-the-badge&labelColor=0f172a)](https://github.com/hihihehadika/gitgwtuh/releases)
 
 A high-aesthetic, keyboard-driven Git TUI explorer and interactive diff viewer built with Go.
 
