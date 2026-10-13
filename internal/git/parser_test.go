@@ -82,3 +82,30 @@ index 1234567..89abcdef 100644
 		t.Errorf("diff parser missing elements: header=%v, added=%v, deleted=%v", hasHeader, hasAdded, hasDeleted)
 	}
 }
+
+
+func BenchmarkParseLogOutput(b *testing.B) {
+	raw := "\x00dcbdb0f1234567890abcdef1234567890abcdef1\x00dcbdb0f\x00hihihehadika\x00dika@example.com\x002026-10-13 16:42\x002 minutes ago\x00chore(init): initialize gitgwtuh\x00Initial commit body\n"
+
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = ParseLogOutput(raw)
+	}
+}
+
+func BenchmarkParseDiffOutput(b *testing.B) {
+	raw := `diff --git a/main.go b/main.go
+index 1234567..89abcdef 100644
+--- a/main.go
++++ b/main.go
+@@ -1,3 +1,4 @@
+ package main
++import "fmt"
+-func old() {}
++func new() {}
+`
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		_ = ParseDiffOutput(raw)
+	}
+}
