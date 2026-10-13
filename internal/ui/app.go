@@ -7,6 +7,7 @@ import (
 	"gitgwtuh/internal/ui/components"
 	"gitgwtuh/internal/ui/styles"
 
+	"github.com/atotto/clipboard"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
@@ -183,10 +184,20 @@ func (m *AppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.searchInput.Focus()
 			return m, textinput.Blink
 
+		case "y":
+			if len(m.commits) > 0 && m.commitIdx < len(m.commits) {
+				hash := m.commits[m.commitIdx].Hash
+				_ = clipboard.WriteAll(hash)
+				m.statusMsg = "TERSALIN: " + m.commits[m.commitIdx].ShortHash
+			}
+			return m, nil
+
 		case "j", "down":
+			m.statusMsg = ""
 			return m.handleNavDown()
 
 		case "k", "up":
+			m.statusMsg = ""
 			return m.handleNavUp()
 
 		case "enter":
@@ -319,7 +330,7 @@ func (m *AppModel) View() string {
 		} else if m.activePane == PaneDiff {
 			paneName = "DIFF"
 		}
-		footer = components.RenderFooter(paneName, m.width)
+		footer = components.RenderFooter(paneName, m.statusMsg, m.width)
 	}
 
 	// Available height for body panels
