@@ -53,3 +53,33 @@ func TestAppModelViewMinSizeGuard(t *testing.T) {
 		t.Errorf("expected view output, got empty string")
 	}
 }
+
+func TestCommitSearchFilter(t *testing.T) {
+	client := git.NewClient(".")
+	model := NewAppModel(client)
+
+	model.allCommits = []git.Commit{
+		{Hash: "111", ShortHash: "111", Author: "alice", Subject: "feat(auth): add login"},
+		{Hash: "222", ShortHash: "222", Author: "bob", Subject: "fix(ui): adjust padding"},
+		{Hash: "333", ShortHash: "333", Author: "alice", Subject: "docs: update readme"},
+	}
+	model.commits = model.allCommits
+
+	// Search for 'auth'
+	model.filterCommits("auth")
+	if len(model.commits) != 1 || model.commits[0].ShortHash != "111" {
+		t.Fatalf("expected 1 commit matching 'auth', got %d", len(model.commits))
+	}
+
+	// Search for author 'alice'
+	model.filterCommits("alice")
+	if len(model.commits) != 2 {
+		t.Fatalf("expected 2 commits matching author 'alice', got %d", len(model.commits))
+	}
+
+	// Clear query resets to allCommits
+	model.filterCommits("")
+	if len(model.commits) != 3 {
+		t.Fatalf("expected 3 commits after reset, got %d", len(model.commits))
+	}
+}
