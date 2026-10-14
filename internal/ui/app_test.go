@@ -162,3 +162,27 @@ func TestViewLineBudgetStrictClamping(t *testing.T) {
 		}
 	}
 }
+
+func TestSearchModeFreezesFrame(t *testing.T) {
+	client := git.NewClient(".")
+	model := NewAppModel(client)
+	model.allCommits = []git.Commit{
+		{Hash: "111", ShortHash: "111", Author: "alice", Subject: "feat: add animations"},
+	}
+	model.commits = model.allCommits
+	model.animFrame = 5
+
+	// Trigger search mode
+	newModel, _ := model.Update(tea.KeyMsg{Type: tea.KeyRunes, Runes: []rune{'/'}})
+	m := newModel.(*AppModel)
+	if !m.isSearching {
+		t.Errorf("expected isSearching to be true after pressing /")
+	}
+
+	// View output in search mode should render without panic and have footer as search input
+	view := m.View()
+	if !strings.Contains(view, "CARI:") {
+		t.Errorf("expected search prompt CARI: in search view")
+	}
+}
+

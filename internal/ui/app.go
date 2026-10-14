@@ -346,7 +346,12 @@ func (m *AppModel) View() string {
 		return lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, warningBox)
 	}
 
-	header := components.RenderHeader(m.summary, m.animFrame, m.animEnabled, m.width)
+	// During search mode, freeze animation frame at 0 to keep border static (Arch Cyan)
+	activeFrame := m.animFrame
+	if m.isSearching {
+		activeFrame = 0
+	}
+	header := components.RenderHeader(m.summary, activeFrame, m.animEnabled, m.width)
 
 	var footer string
 	if m.isSearching {
@@ -384,7 +389,7 @@ func (m *AppModel) View() string {
 		m.commitOff,
 		leftWidth,
 		bodyHeight,
-		m.animFrame,
+		activeFrame,
 		m.animEnabled,
 		m.activePane == PaneCommits,
 	)
@@ -405,7 +410,7 @@ func (m *AppModel) View() string {
 		m.fileIdx,
 		rightWidth,
 		detailHeight,
-		m.animFrame,
+		activeFrame,
 		m.animEnabled,
 		m.activePane == PaneFiles,
 	)
@@ -415,7 +420,7 @@ func (m *AppModel) View() string {
 		m.diffOff,
 		rightWidth,
 		diffHeight,
-		m.animFrame,
+		activeFrame,
 		m.animEnabled,
 		m.activePane == PaneDiff,
 	)
