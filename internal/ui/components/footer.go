@@ -17,9 +17,10 @@ func RenderFooter(activePaneName, statusMsg string, width int) string {
 	key2 := lipgloss.JoinHorizontal(lipgloss.Left, styles.FooterKey.Render("Tab"), styles.FooterDesc.Render("Panel"))
 	key3 := lipgloss.JoinHorizontal(lipgloss.Left, styles.FooterKey.Render("/"), styles.FooterDesc.Render("Cari"))
 	key4 := lipgloss.JoinHorizontal(lipgloss.Left, styles.FooterKey.Render("y"), styles.FooterDesc.Render("Salin SHA"))
-	key5 := lipgloss.JoinHorizontal(lipgloss.Left, styles.FooterKey.Render("q"), styles.FooterDesc.Render("Keluar"))
+	key5 := lipgloss.JoinHorizontal(lipgloss.Left, styles.FooterKey.Render("a"), styles.FooterDesc.Render("Animasi"))
+	key6 := lipgloss.JoinHorizontal(lipgloss.Left, styles.FooterKey.Render("q"), styles.FooterDesc.Render("Keluar"))
 
-	keyGroup := lipgloss.JoinHorizontal(lipgloss.Center, key1, key2, key3, key4, key5)
+	keyGroup := lipgloss.JoinHorizontal(lipgloss.Center, key1, key2, key3, key4, key5, key6)
 
 	totalPillsWidth := lipgloss.Width(modeBadge) + lipgloss.Width(keyGroup)
 	spacerWidth := width - totalPillsWidth
@@ -28,6 +29,7 @@ func RenderFooter(activePaneName, statusMsg string, width int) string {
 	}
 
 	spacer := lipgloss.NewStyle().Width(spacerWidth).Render("")
+	footerLine := lipgloss.JoinHorizontal(lipgloss.Center, modeBadge, spacer, keyGroup)
 
-	return lipgloss.JoinHorizontal(lipgloss.Center, modeBadge, spacer, keyGroup)
+	return lipgloss.NewStyle().MaxWidth(width).Render(footerLine)
 }
