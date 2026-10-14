@@ -7,26 +7,26 @@
 A high-aesthetic, keyboard-driven Git TUI explorer and interactive diff viewer built with Go.
 
 ```text
-+-- [ gitgwtuh ] --------------------- [ * main ] -- [ 18 COMMITS ] -- [ REPO: gitgwtuh ] -+
++-- [ gitgwtuh ] [ ▄▆█▆▄ ] [ * main ] ------------- [ 28 COMMITS ] -- [ REPO: gitgwtuh ] -+
 |                                  |                                                         |
 |  COMMIT TIMELINE                 |  +-- COMMIT DETAIL & FILES ---------------------------+ |
-|  ─────────────────────────────── |  | HASH   : d110060938a1bc4e910248...                 | |
-|  ● [d110060] ci: add github acti |  | AUTHOR : hihihehadika <hihihehadika@gmail.com>     | |
-|  ○ [7e7097a] test(perf): add ben |  | DATE   : 2026-10-13 17:04 (2 minutes ago)          | |
-|  ○ [bc91c0c] feat(ui): add commi |  | SUBJ   : ci: add github actions workflow           | |
-|  ○ [cff4981] test(search): add u |  +----------------------------------------------------+ |
-|  ○ [4bc079b] feat(search): imple |  +-- CHANGED FILES -----------------------------------+ |
-|  ○ [6e5c910] build: add run.bat  |  | [A] .github/workflows/ci.yml   (+58  -0)           | |
-|  ○ [c332046] feat(cli): create a |  +----------------------------------------------------+ |
-|  ○ [ea0dc95] feat(ui): implement |  +-- SYNTAX DIFF VIEWER ------------------------------+ |
-|  ○ [4938927] feat(ui): implement |  | @@ -0,0 +1,58 @@                                   | |
-|  ○ [5749e9a] feat(ui): implement |  | +   name: CI                                       | |
-|  ○ [25e9415] feat(ui): implement |  | +   on:                                            | |
-|  ○ [7559d07] feat(ui): implement |  | +     push:                                        | |
-|  ○ [4c596fe] feat(ui): implement |  | +       branches: [ main ]                         | |
-|  ○ [6463da2] feat(ui): design cy |  +----------------------------------------------------+ |
+|  ─────────────────────────────── |  | HASH   : 063e5ff38a1bc4e910248...                  | |
+|  ● [063e5ff] test: add animatio  |  | AUTHOR : hihihehadika <hihihehadika@gmail.com>      | |
+|  ○ [a5126a0] feat(app): add ani  |  | DATE   : 2026-10-14 18:43 (just now)               | |
+|  ○ [f96b2a0] feat(footer): add   |  | SUBJ   : test: add animation unit tests            | |
+|  ○ [26103be] fix(diff-view): fi  |  +----------------------------------------------------+ |
+|  ○ [063d1a6] fix(commit-detail)  |  +-- CHANGED FILES -----------------------------------+ |
+|  ○ [576a16d] fix(commit-list):   |  | [M] internal/ui/app_test.go         (+58  -0)      | |
+|  ○ [c659d5c] feat(header): add   |  +----------------------------------------------------+ |
+|  ○ [3d96fa6] feat(theme): add B  |  +-- SYNTAX DIFF VIEWER ------------------------------+ |
+|  ○ [84848c7] docs: remove relea  |  | @@ -0,0 +1,58 @@                                  | |
+|  ○ [df2431f] style(docs): moder  |  | +   func TestAnimationToggle(t *testing.T) {       | |
+|                                  |  | +     model := NewAppModel(client)                  | |
+|                                  |  | +     if !model.animEnabled {                       | |
+|                                  |  | +       t.Errorf("expected anim on by default")     | |
+|                                  |  +----------------------------------------------------+ |
 +--------------------------------------------------------------------------------------------+
-| [PANE: LOGS]   j/k: Navigasi | Tab: Panel | /: Cari | y: Salin SHA | q: Keluar             |
+| [PANE: LOGS]  j/k: Navigasi | Tab: Panel | /: Cari | y: Salin SHA | a: Animasi | q: Keluar |
 +--------------------------------------------------------------------------------------------+
 ```
 
@@ -35,11 +35,13 @@ A high-aesthetic, keyboard-driven Git TUI explorer and interactive diff viewer b
 ## Features
 
 - **Terminal-Native Tiling Layout:** Clean 3-panel display inspired by modern tiling window managers, showing your commit timeline, metadata inspector, and syntax-highlighted code diff simultaneously.
+- **Cyber Breathing Glow Animation:** Active panel border pulses with a smooth neon gradient cycle (Cyan to Indigo to Violet) at 10 FPS, zero CPU overhead.
+- **Live Telemetry Wave:** Top header displays a real-time block-character pulse (`▂▄▆█▇▅▃`) to signal active repository monitoring.
 - **Deep Cosmic Cyber Theme:** Crafted with 24-bit TrueColor ANSI palettes featuring deep slate backgrounds, vibrant cyan accents, and clear status pill badges.
 - **Interactive Search Filter:** Instant commit searching by message, author, or hash with `/` shortcut.
 - **Clipboard SHA Yanking:** Copy full commit hashes directly to system clipboard using `y`.
 - **Pure Go & Zero CGo:** Runs smoothly on Windows Terminal, PowerShell, and Unix shells with zero native library headaches.
-- **Vim-Style Keybindings:** Navigate effortlessly using standard keyboard shortcuts (`j`, `k`, `Tab`, `Enter`, `/`, `y`, `q`).
+- **Vim-Style Keybindings:** Navigate effortlessly using standard keyboard shortcuts (`j`, `k`, `Tab`, `Enter`, `/`, `y`, `a`, `q`).
 - **Dynamic Resize Engine:** Automatically recalculates panel bounds on window resize events to keep borders and text crisp.
 - **Safe Read-Only Operation:** Inspects commits, branches, and diffs without modifying or risking your repository state.
 
@@ -55,6 +57,7 @@ A high-aesthetic, keyboard-driven Git TUI explorer and interactive diff viewer b
 | `Enter` | Expand commit details or view file-specific diff |
 | `/` | Open live search bar to filter commits |
 | `y` | Copy (yank) selected commit hash to clipboard |
+| `a` | Toggle animation on / off (battery saver mode) |
 | `Esc` | Clear search filter or dismiss active prompt |
 | `q` / `Ctrl+C` | Quit and restore terminal screen cleanly |
 
