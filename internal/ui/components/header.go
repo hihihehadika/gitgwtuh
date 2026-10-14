@@ -9,11 +9,19 @@ import (
 	"github.com/charmbracelet/lipgloss"
 )
 
-// RenderHeader renders the top telemetry header with repository statistics and pill badges.
-func RenderHeader(summary git.RepoSummary, width int) string {
+// RenderHeader renders the top telemetry header with repository statistics, pill badges, and live wave.
+func RenderHeader(summary git.RepoSummary, frame int, animEnabled bool, width int) string {
+	var waveBadge string
+	if animEnabled {
+		waveBadge = styles.WavePill.Render(styles.GetTelemetryWave(frame))
+	} else {
+		waveBadge = styles.StatPill.Render("IDLE")
+	}
+
 	leftPills := lipgloss.JoinHorizontal(
 		lipgloss.Center,
 		styles.BrandBadge.Render("gitgwtuh"),
+		waveBadge,
 		styles.BranchPill.Render("* "+summary.CurrentBranch),
 	)
 
@@ -36,7 +44,6 @@ func RenderHeader(summary git.RepoSummary, width int) string {
 		repoPill,
 	)
 
-	// Calculate space between left badges and right badges
 	totalPillsWidth := lipgloss.Width(leftPills) + lipgloss.Width(rightPills)
 	spacerWidth := width - totalPillsWidth
 	if spacerWidth < 1 {
@@ -44,6 +51,7 @@ func RenderHeader(summary git.RepoSummary, width int) string {
 	}
 
 	spacer := lipgloss.NewStyle().Width(spacerWidth).Render("")
+	headerLine := lipgloss.JoinHorizontal(lipgloss.Center, leftPills, spacer, rightPills)
 
-	return lipgloss.JoinHorizontal(lipgloss.Center, leftPills, spacer, rightPills)
+	return lipgloss.NewStyle().MaxWidth(width).Render(headerLine)
 }
