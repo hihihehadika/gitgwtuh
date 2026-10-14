@@ -2,6 +2,7 @@ package ui
 
 import (
 	"strings"
+	"time"
 
 	"gitgwtuh/internal/git"
 	"gitgwtuh/internal/ui/components"
@@ -45,6 +46,9 @@ type AppModel struct {
 	isSearching bool
 	searchInput textinput.Model
 	statusMsg   string
+
+	animFrame   int
+	animEnabled bool
 }
 
 // NewAppModel initializes the AppModel with a Git client.
@@ -61,12 +65,21 @@ func NewAppModel(client *git.Client) *AppModel {
 		width:       100,
 		height:      30,
 		searchInput: ti,
+		animEnabled: true,
 	}
+}
+
+type tickMsg time.Time
+
+func tickCmd() tea.Cmd {
+	return tea.Tick(100*time.Millisecond, func(t time.Time) tea.Msg {
+		return tickMsg(t)
+	})
 }
 
 // Init triggers initial data loading when Bubbletea begins.
 func (m *AppModel) Init() tea.Cmd {
-	return m.loadInitialData
+	return tea.Batch(m.loadInitialData, tickCmd())
 }
 
 // loadInitialData fetches summary, commit log, and initial commit detail.
@@ -144,6 +157,12 @@ func (m *AppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.diffOff = 0
 		return m, nil
 
+	case tickMsg:
+		if m.animEnabled {
+			m.animFrame++
+		}
+		return m, tickCmd()
+
 	case errMsg:
 		m.err = msg.err
 		return m, nil
@@ -177,6 +196,15 @@ func (m *AppModel) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 		case "tab":
 			m.activePane = (m.activePane + 1) % 3
+			return m, nil
+
+		case "a":
+			m.animEnabled = !m.animEnabled
+			if m.animEnabled {
+				m.statusMsg = "Animasi: Aktif"
+			} else {
+				m.statusMsg = "Animasi: Nonaktif"
+			}
 			return m, nil
 
 		case "/":
@@ -318,7 +346,7 @@ func (m *AppModel) View() string {
 		return lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center, warningBox)
 	}
 
-	header := components.RenderHeader(m.summary, m.width)
+	header := components.RenderHeader(m.summary, m.animFrame, m.animEnabled, m.width)
 
 	var footer string
 	if m.isSearching {
@@ -333,15 +361,17 @@ func (m *AppModel) View() string {
 		footer = components.RenderFooter(paneName, m.statusMsg, m.width)
 	}
 
-	// Available height for body panels
-	bodyHeight := m.height - 4
+	// Available height for body panels:
+	// Total screen = header (1) + body (bodyHeight) + footer (1) + safety buffer (1)
+	// So bodyHeight := m.height - 3 ensures entire view is strictly m.height - 1 lines
+	bodyHeight := m.height - 3
 	if bodyHeight < 10 {
 		bodyHeight = 10
 	}
 
 	// Columns split: Left (40%), Right (60%)
-	leftWidth := (m.width * 4) / 10
-	rightWidth := m.width - leftWidth - 1
+	leftWidth := (m.width * 40) / 100
+	rightWidth := m.width - leftWidth
 
 	var activeCommit *git.Commit
 	if len(m.commits) > 0 && m.commitIdx < len(m.commits) {
@@ -354,12 +384,20 @@ func (m *AppModel) View() string {
 		m.commitOff,
 		leftWidth,
 		bodyHeight,
+		m.animFrame,
+		m.animEnabled,
 		m.activePane == PaneCommits,
 	)
 
-	// Right column vertical split: Detail (38%), Diff (62%)
-	detailHeight := (bodyHeight * 38) / 100
-	diffHeight := bodyHeight - detailHeight - 1
+	// Right column vertical split: Detail (36%), Diff (64%)
+	detailHeight := (bodyHeight * 36) / 100
+	if detailHeight < 8 {
+		detailHeight = 8
+	}
+	diffHeight := bodyHeight - detailHeight
+	if diffHeight < 6 {
+		diffHeight = 6
+	}
 
 	rightDetail := components.RenderCommitDetail(
 		activeCommit,
@@ -367,6 +405,8 @@ func (m *AppModel) View() string {
 		m.fileIdx,
 		rightWidth,
 		detailHeight,
+		m.animFrame,
+		m.animEnabled,
 		m.activePane == PaneFiles,
 	)
 
@@ -375,6 +415,8 @@ func (m *AppModel) View() string {
 		m.diffOff,
 		rightWidth,
 		diffHeight,
+		m.animFrame,
+		m.animEnabled,
 		m.activePane == PaneDiff,
 	)
 
