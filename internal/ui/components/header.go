@@ -19,7 +19,7 @@ func RenderHeader(summary git.RepoSummary, frame int, animEnabled bool, width in
 	}
 
 	leftPills := lipgloss.JoinHorizontal(
-		lipgloss.Center,
+		lipgloss.Left,
 		styles.BrandBadge.Render("gitgwtuh"),
 		waveBadge,
 		styles.BranchPill.Render("* "+summary.CurrentBranch),
@@ -36,22 +36,38 @@ func RenderHeader(summary git.RepoSummary, frame int, animEnabled bool, width in
 	authorPill := styles.StatPill.Render(fmt.Sprintf("%d AUTHORS", summary.TotalAuthors))
 	repoPill := styles.StatPill.Render("REPO: " + summary.Name)
 
-	rightPills := lipgloss.JoinHorizontal(
-		lipgloss.Center,
-		statusPill,
-		commitPill,
-		authorPill,
-		repoPill,
-	)
+	leftW := lipgloss.Width(leftPills)
+	availForRight := width - leftW - 1
 
-	totalPillsWidth := lipgloss.Width(leftPills) + lipgloss.Width(rightPills)
+	var rightPillCandidates = [][]string{
+		{statusPill, commitPill, authorPill, repoPill},
+		{statusPill, commitPill, repoPill},
+		{statusPill, commitPill},
+		{statusPill},
+	}
+
+	var chosenRightPills []string
+	for _, cand := range rightPillCandidates {
+		joined := lipgloss.JoinHorizontal(lipgloss.Left, cand...)
+		if lipgloss.Width(joined) <= availForRight {
+			chosenRightPills = cand
+			break
+		}
+	}
+
+	var rightPills string
+	if len(chosenRightPills) > 0 {
+		rightPills = lipgloss.JoinHorizontal(lipgloss.Left, chosenRightPills...)
+	}
+
+	totalPillsWidth := leftW + lipgloss.Width(rightPills)
 	spacerWidth := width - totalPillsWidth
-	if spacerWidth < 1 {
-		spacerWidth = 1
+	if spacerWidth < 0 {
+		spacerWidth = 0
 	}
 
 	spacer := lipgloss.NewStyle().Width(spacerWidth).Render("")
-	headerLine := lipgloss.JoinHorizontal(lipgloss.Center, leftPills, spacer, rightPills)
+	headerLine := lipgloss.JoinHorizontal(lipgloss.Left, leftPills, spacer, rightPills)
 
 	return lipgloss.NewStyle().MaxWidth(width).Render(headerLine)
 }

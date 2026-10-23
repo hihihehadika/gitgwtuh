@@ -20,16 +20,16 @@ func RenderFooter(activePaneName, statusMsg string, width int) string {
 	key5 := lipgloss.JoinHorizontal(lipgloss.Left, styles.FooterKey.Render("a"), styles.FooterDesc.Render("Animasi"))
 	key6 := lipgloss.JoinHorizontal(lipgloss.Left, styles.FooterKey.Render("q"), styles.FooterDesc.Render("Keluar"))
 
-	keyGroup := lipgloss.JoinHorizontal(lipgloss.Center, key1, key2, key3, key4, key5, key6)
+	keyGroup := lipgloss.JoinHorizontal(lipgloss.Left, key1, key2, key3, key4, key5, key6)
 
 	totalPillsWidth := lipgloss.Width(modeBadge) + lipgloss.Width(keyGroup)
 	spacerWidth := width - totalPillsWidth
-	if spacerWidth < 1 {
-		spacerWidth = 1
+	if spacerWidth < 0 {
+		spacerWidth = 0
 	}
 
 	spacer := lipgloss.NewStyle().Width(spacerWidth).Render("")
-	footerLine := lipgloss.JoinHorizontal(lipgloss.Center, modeBadge, spacer, keyGroup)
+	footerLine := lipgloss.JoinHorizontal(lipgloss.Left, modeBadge, spacer, keyGroup)
 
 	return lipgloss.NewStyle().MaxWidth(width).Render(footerLine)
 }
