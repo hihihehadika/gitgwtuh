@@ -128,6 +128,7 @@ func TestViewLineBudgetStrictClamping(t *testing.T) {
 	model.commits = model.allCommits
 
 	dimensions := [][2]int{
+		{75, 18},
 		{80, 24},
 		{100, 30},
 		{120, 40},
@@ -138,25 +139,41 @@ func TestViewLineBudgetStrictClamping(t *testing.T) {
 		model.width = dim[0]
 		model.height = dim[1]
 
-		bodyHeight := model.height - 3
+		hH := lipgloss.Height(components.RenderHeader(model.summary, 0, false, model.width))
+		hF := lipgloss.Height(components.RenderFooter("LOGS", "", model.width))
+		bodyHeight := model.height - hH - hF - 1
+		if bodyHeight < 8 {
+			bodyHeight = 8
+		}
 		leftWidth := (model.width * 40) / 100
 		rightWidth := model.width - leftWidth
 		detailHeight := (bodyHeight * 36) / 100
-		if detailHeight < 8 {
-			detailHeight = 8
+		if detailHeight < 6 {
+			detailHeight = 6
+		}
+		if detailHeight > bodyHeight-6 {
+			detailHeight = bodyHeight - 6
 		}
 		diffHeight := bodyHeight - detailHeight
 
-		hH := lipgloss.Height(components.RenderHeader(model.summary, 0, false, model.width))
 		hL := lipgloss.Height(components.RenderCommitList(model.commits, 0, 0, leftWidth, bodyHeight, 0, false, true))
 		hD := lipgloss.Height(components.RenderCommitDetail(&model.commits[0], model.files, 0, rightWidth, detailHeight, 0, false, false))
 		hDiff := lipgloss.Height(components.RenderDiffView(model.diff, 0, rightWidth, diffHeight, 0, false, false))
-		hF := lipgloss.Height(components.RenderFooter("LOGS", "", model.width))
 
 		view := model.View()
 		lines := strings.Split(view, "\n")
-		t.Logf("size %dx%d: header=%d, left=%d(want %d), detail=%d(want %d), diff=%d(want %d), footer=%d -> total=%d",
-			dim[0], dim[1], hH, hL, bodyHeight, hD, detailHeight, hDiff, diffHeight, hF, len(lines))
+		actualHeight := lipgloss.Height(view)
+		actualWidth := lipgloss.Width(view)
+
+		t.Logf("size %dx%d: header=%d, left=%d(want %d), detail=%d(want %d), diff=%d(want %d), footer=%d -> totalH=%d, totalW=%d",
+			dim[0], dim[1], hH, hL, bodyHeight, hD, detailHeight, hDiff, diffHeight, hF, actualHeight, actualWidth)
+
+		if actualHeight > model.height {
+			t.Errorf("terminal size %dx%d: view height (%d) exceeded allocated height (%d)", model.width, model.height, actualHeight, model.height)
+		}
+		if actualWidth > model.width {
+			t.Errorf("terminal size %dx%d: view width (%d) exceeded allocated width (%d)", model.width, model.height, actualWidth, model.width)
+		}
 		if len(lines) > model.height {
 			t.Errorf("terminal size %dx%d: view lines (%d) exceeded height (%d)", model.width, model.height, len(lines), model.height)
 		}

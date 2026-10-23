@@ -34,6 +34,75 @@ func TestRenderHeader(t *testing.T) {
 	}
 }
 
+func TestHeaderSingleLineStrict(t *testing.T) {
+	summary := git.RepoSummary{
+		CurrentBranch: "feature/super-long-branch-name-for-testing",
+		TotalCommits:  12345,
+		TotalAuthors:  42,
+		Name:          "super-long-repository-name",
+		IsClean:       false,
+	}
+
+	widths := []int{75, 80, 85, 90, 100, 120, 160, 200}
+	for _, w := range widths {
+		header := RenderHeader(summary, 1, true, w)
+		h := lipgloss.Height(header)
+		actualW := lipgloss.Width(header)
+		if h != 1 {
+			t.Errorf("width %d: expected header height 1, got %d", w, h)
+		}
+		if actualW > w {
+			t.Errorf("width %d: header width %d exceeded allocated width", w, actualW)
+		}
+	}
+}
+
+func TestBoxDimensionParity(t *testing.T) {
+	commits := []git.Commit{
+		{Hash: "abc1234567890", ShortHash: "abc1234", Subject: "feat: add animations", Author: "dika", RelativeDate: "10 mins ago"},
+	}
+	files := []git.FileChange{
+		{Status: "M", Path: "internal/ui/app.go", Additions: 15, Deletions: 5},
+	}
+	diffText := "diff --git a/a.txt b/a.txt\n--- a/a.txt\n+++ b/a.txt\n@@ -1 +1 @@\n-old\n+new\n"
+
+	testCases := []struct {
+		outerW int
+		outerH int
+	}{
+		{30, 12},
+		{45, 18},
+		{60, 24},
+		{80, 30},
+	}
+
+	for _, tc := range testCases {
+		resList := RenderCommitList(commits, 0, 0, tc.outerW, tc.outerH, 0, false, true)
+		if w := lipgloss.Width(resList); w != tc.outerW {
+			t.Errorf("RenderCommitList: expected width %d, got %d", tc.outerW, w)
+		}
+		if h := lipgloss.Height(resList); h != tc.outerH {
+			t.Errorf("RenderCommitList: expected height %d, got %d", tc.outerH, h)
+		}
+
+		resDetail := RenderCommitDetail(&commits[0], files, 0, tc.outerW, tc.outerH, 0, false, true)
+		if w := lipgloss.Width(resDetail); w != tc.outerW {
+			t.Errorf("RenderCommitDetail: expected width %d, got %d", tc.outerW, w)
+		}
+		if h := lipgloss.Height(resDetail); h != tc.outerH {
+			t.Errorf("RenderCommitDetail: expected height %d, got %d", tc.outerH, h)
+		}
+
+		resDiff := RenderDiffView(diffText, 0, tc.outerW, tc.outerH, 0, false, true)
+		if w := lipgloss.Width(resDiff); w != tc.outerW {
+			t.Errorf("RenderDiffView: expected width %d, got %d", tc.outerW, w)
+		}
+		if h := lipgloss.Height(resDiff); h != tc.outerH {
+			t.Errorf("RenderDiffView: expected height %d, got %d", tc.outerH, h)
+		}
+	}
+}
+
 func TestRenderCommitList(t *testing.T) {
 	commits := []git.Commit{
 		{Hash: "abc1234567890", ShortHash: "abc1234", Subject: "feat: add cyber animations", Author: "dika", RelativeDate: "10 mins ago"},
