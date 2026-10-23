@@ -17,26 +17,34 @@ func RenderDiffView(diffText string, scrollOffset, outerWidth, outerHeight, fram
 		boxStyle = styles.GetActivePanelBox(frame, animEnabled)
 	}
 
-	innerW := outerWidth - 4
-	if innerW < 10 {
-		innerW = 10
+	boxW := outerWidth - 2
+	if boxW < 8 {
+		boxW = 8
 	}
-	innerH := outerHeight - 2
-	if innerH < 1 {
-		innerH = 1
+	textW := boxW - 2
+	if textW < 6 {
+		textW = 6
+	}
+	boxH := outerHeight - 2
+	if boxH < 1 {
+		boxH = 1
 	}
 
 	title := styles.PanelTitle.Render("SYNTAX DIFF VIEWER")
-	separator := lipgloss.NewStyle().Foreground(styles.ColorBorder).Render(strings.Repeat("─", innerW))
+	separator := lipgloss.NewStyle().Foreground(styles.ColorBorder).Render(strings.Repeat("─", textW))
 
 	if strings.TrimSpace(diffText) == "" {
 		emptyMsg := lipgloss.NewStyle().Foreground(styles.ColorMuted).Render("Tidak ada perubahan kode untuk ditampilkan.")
 		content := lipgloss.JoinVertical(lipgloss.Left, title, separator, "", emptyMsg)
-		return boxStyle.Width(innerW).Height(innerH).Render(content)
+		lines := strings.Split(content, "\n")
+		if len(lines) > boxH {
+			lines = lines[:boxH]
+		}
+		return boxStyle.Width(boxW).Height(boxH).Render(strings.Join(lines, "\n"))
 	}
 
 	parsedLines := git.ParseDiffOutput(diffText)
-	visibleCount := innerH - 2
+	visibleCount := boxH - 2
 	if visibleCount < 1 {
 		visibleCount = 1
 	}
@@ -66,7 +74,7 @@ func RenderDiffView(diffText string, scrollOffset, outerWidth, outerHeight, fram
 			numGutter = styles.DiffLineNum.Render("    ")
 		}
 
-		lineContentWidth := innerW - lipgloss.Width(numGutter) - 1
+		lineContentWidth := textW - lipgloss.Width(numGutter) - 1
 		if lineContentWidth < 5 {
 			lineContentWidth = 5
 		}
@@ -88,10 +96,10 @@ func RenderDiffView(diffText string, scrollOffset, outerWidth, outerHeight, fram
 
 	content := lipgloss.JoinVertical(lipgloss.Left, title, separator, strings.Join(renderedRows, "\n"))
 	lines := strings.Split(content, "\n")
-	if len(lines) > innerH {
-		lines = lines[:innerH]
+	if len(lines) > boxH {
+		lines = lines[:boxH]
 	}
 	content = strings.Join(lines, "\n")
 
-	return boxStyle.Width(innerW).Height(innerH).Render(content)
+	return boxStyle.Width(boxW).Height(boxH).Render(content)
 }

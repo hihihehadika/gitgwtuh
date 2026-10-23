@@ -17,19 +17,23 @@ func RenderCommitList(commits []git.Commit, selectedIndex, scrollOffset, outerWi
 		boxStyle = styles.GetActivePanelBox(frame, animEnabled)
 	}
 
-	innerW := outerWidth - 4
-	if innerW < 10 {
-		innerW = 10
+	boxW := outerWidth - 2
+	if boxW < 8 {
+		boxW = 8
 	}
-	innerH := outerHeight - 2
-	if innerH < 1 {
-		innerH = 1
+	textW := boxW - 2
+	if textW < 6 {
+		textW = 6
+	}
+	boxH := outerHeight - 2
+	if boxH < 1 {
+		boxH = 1
 	}
 
 	title := styles.PanelTitle.Render("COMMIT TIMELINE")
-	separator := lipgloss.NewStyle().Foreground(styles.ColorBorder).Render(strings.Repeat("─", innerW))
+	separator := lipgloss.NewStyle().Foreground(styles.ColorBorder).Render(strings.Repeat("─", textW))
 
-	visibleCount := innerH - 2
+	visibleCount := boxH - 2
 	if visibleCount < 1 {
 		visibleCount = 1
 	}
@@ -37,7 +41,11 @@ func RenderCommitList(commits []git.Commit, selectedIndex, scrollOffset, outerWi
 	if len(commits) == 0 {
 		emptyMsg := lipgloss.NewStyle().Foreground(styles.ColorMuted).Render("Belum ada riwayat commit pada repositori ini.")
 		content := lipgloss.JoinVertical(lipgloss.Left, title, separator, emptyMsg)
-		return boxStyle.Width(innerW).Height(innerH).Render(content)
+		lines := strings.Split(content, "\n")
+		if len(lines) > boxH {
+			lines = lines[:boxH]
+		}
+		return boxStyle.Width(boxW).Height(boxH).Render(strings.Join(lines, "\n"))
 	}
 
 	endIndex := scrollOffset + visibleCount
@@ -60,7 +68,7 @@ func RenderCommitList(commits []git.Commit, selectedIndex, scrollOffset, outerWi
 
 		// Calculate available width for subject line
 		fixedWidth := lipgloss.Width(marker) + 1 + lipgloss.Width(hashText) + 1 + lipgloss.Width(timeText) + 1
-		availSubjectWidth := innerW - fixedWidth
+		availSubjectWidth := textW - fixedWidth
 		subject := c.Subject
 		if availSubjectWidth > 4 && len(subject) > availSubjectWidth {
 			subject = subject[:availSubjectWidth-3] + "..."
@@ -71,20 +79,20 @@ func RenderCommitList(commits []git.Commit, selectedIndex, scrollOffset, outerWi
 		line := fmt.Sprintf("%s %s %s %s", marker, hashText, subject, timeText)
 
 		if isSelected {
-			styledLine := styles.CommitItemSelected.MaxWidth(innerW).Render(line)
+			styledLine := styles.CommitItemSelected.MaxWidth(textW).Render(line)
 			rows = append(rows, styledLine)
 		} else {
-			styledLine := styles.CommitItemNormal.MaxWidth(innerW).Render(line)
+			styledLine := styles.CommitItemNormal.MaxWidth(textW).Render(line)
 			rows = append(rows, styledLine)
 		}
 	}
 
 	content := lipgloss.JoinVertical(lipgloss.Left, title, separator, strings.Join(rows, "\n"))
 	lines := strings.Split(content, "\n")
-	if len(lines) > innerH {
-		lines = lines[:innerH]
+	if len(lines) > boxH {
+		lines = lines[:boxH]
 	}
 	content = strings.Join(lines, "\n")
 
-	return boxStyle.Width(innerW).Height(innerH).Render(content)
+	return boxStyle.Width(boxW).Height(boxH).Render(content)
 }
