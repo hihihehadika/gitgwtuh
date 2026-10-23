@@ -366,12 +366,16 @@ func (m *AppModel) View() string {
 		footer = components.RenderFooter(paneName, m.statusMsg, m.width)
 	}
 
+	// 2. Measure actual heights of header and footer - Measure Don't Assume
+	actualHeaderH := lipgloss.Height(header)
+	actualFooterH := lipgloss.Height(footer)
+
 	// Available height for body panels:
-	// Total screen = header (1) + body (bodyHeight) + footer (1) + safety buffer (1)
-	// So bodyHeight := m.height - 3 ensures entire view is strictly m.height - 1 lines
-	bodyHeight := m.height - 3
-	if bodyHeight < 10 {
-		bodyHeight = 10
+	// Total screen = actualHeaderH + bodyHeight + actualFooterH + 1 safety buffer line
+	// Leaving 1 safety buffer line ensures the terminal emulator NEVER scrolls
+	bodyHeight := m.height - actualHeaderH - actualFooterH - 1
+	if bodyHeight < 8 {
+		bodyHeight = 8
 	}
 
 	// Columns split: Left (40%), Right (60%)
@@ -396,13 +400,13 @@ func (m *AppModel) View() string {
 
 	// Right column vertical split: Detail (36%), Diff (64%)
 	detailHeight := (bodyHeight * 36) / 100
-	if detailHeight < 8 {
-		detailHeight = 8
+	if detailHeight < 6 {
+		detailHeight = 6
+	}
+	if detailHeight > bodyHeight-6 {
+		detailHeight = bodyHeight - 6
 	}
 	diffHeight := bodyHeight - detailHeight
-	if diffHeight < 6 {
-		diffHeight = 6
-	}
 
 	rightDetail := components.RenderCommitDetail(
 		activeCommit,
