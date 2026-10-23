@@ -6,29 +6,9 @@
 
 A high-aesthetic, keyboard-driven Git TUI explorer and interactive diff viewer built with Go.
 
-```text
-+-- [ gitgwtuh ] [ ▄▆█▆▄ ] [ * main ] ------------- [ 28 COMMITS ] -- [ REPO: gitgwtuh ] -+
-|                                  |                                                         |
-|  COMMIT TIMELINE                 |  +-- COMMIT DETAIL & FILES ---------------------------+ |
-|  ─────────────────────────────── |  | HASH   : 063e5ff38a1bc4e910248...                  | |
-|  ● [063e5ff] test: add animatio  |  | AUTHOR : hihihehadika <hihihehadika@gmail.com>      | |
-|  ○ [a5126a0] feat(app): add ani  |  | DATE   : 2026-10-14 18:43 (just now)               | |
-|  ○ [f96b2a0] feat(footer): add   |  | SUBJ   : test: add animation unit tests            | |
-|  ○ [26103be] fix(diff-view): fi  |  +----------------------------------------------------+ |
-|  ○ [063d1a6] fix(commit-detail)  |  +-- CHANGED FILES -----------------------------------+ |
-|  ○ [576a16d] fix(commit-list):   |  | [M] internal/ui/app_test.go         (+58  -0)      | |
-|  ○ [c659d5c] feat(header): add   |  +----------------------------------------------------+ |
-|  ○ [3d96fa6] feat(theme): add B  |  +-- SYNTAX DIFF VIEWER ------------------------------+ |
-|  ○ [84848c7] docs: remove relea  |  | @@ -0,0 +1,58 @@                                  | |
-|  ○ [df2431f] style(docs): moder  |  | +   func TestAnimationToggle(t *testing.T) {       | |
-|                                  |  | +     model := NewAppModel(client)                  | |
-|                                  |  | +     if !model.animEnabled {                       | |
-|                                  |  | +       t.Errorf("expected anim on by default")     | |
-|                                  |  +----------------------------------------------------+ |
-+--------------------------------------------------------------------------------------------+
-| [PANE: LOGS]  j/k: Navigasi | Tab: Panel | /: Cari | y: Salin SHA | a: Animasi | q: Keluar |
-+--------------------------------------------------------------------------------------------+
-```
+<p align="center">
+  <img src="assets/preview.png" alt="gitgwtuh Terminal UI Preview" width="100%" />
+</p>
 
 ---
 
